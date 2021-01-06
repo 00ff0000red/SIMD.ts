@@ -1,6 +1,6 @@
 # SIMD.ts #
 
-Loosly inspired by SIMD.js, SIMD.ts is an OOP-styled, type-safe interface for TypeScript (or JavaScript) to leverage WebAssembly SIMD instructions and vectorized arithmetic.
+Loosly inspired by [SIMD.js](https://github.com/tc39/ecmascript_simd), SIMD.ts is an OOP-styled, type-safe interface for TypeScript (and JavaScript) to leverage WebAssembly SIMD instructions and vectorized arithmetic.
 
 This library depends on bleeding edge and experimental JavaScript and WebAssembly features that cannot be polyfilled, ex: JavaScript WeakRefs, Wasm v128 SIMD operations.
 
@@ -11,4 +11,4 @@ Most of the .wat was compiled from C++, then hand-edited afterward for micro-opt
 **Warning**:
 This TS/JS wrapper will need to be rewritten if the [TC39 remove builtin subclassing proposal](https://github.com/tc39/proposal-rm-builtin-subclassing) becomes a part of the ES262 specification.
 
-TODO: API here, type defs, etc.
+TODO: API here, type defs, methodology, etc.
