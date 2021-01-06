@@ -1,6 +1,6 @@
 # SIMD.ts #
 
-SIMD.ts is an OOP-styled, type-safe interface for TypeScript (or JavaScript) to leverage WebAssembly SIMD instructions and vectorized arithmetic. 
+Loosly inspired by SIMD.js, SIMD.ts is an OOP-styled, type-safe interface for TypeScript (or JavaScript) to leverage WebAssembly SIMD instructions and vectorized arithmetic.
 
 This library depends on bleeding edge and experimental JavaScript and WebAssembly features that cannot be polyfilled, ex: JavaScript WeakRefs, Wasm v128 SIMD operations.
 
