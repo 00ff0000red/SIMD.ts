@@ -9,6 +9,6 @@ Everything is written in a browser compatible fashion, meaning that it can run i
 Most of the .wat was compiled from C++, then hand-edited afterward for micro-optimizations.
 
 **Warning**:
-This TS/JS wrapper will need to be rewritten if the [TC39 remove builtin subclassing proposal](https://github.com/tc39/proposal-rm-builtin-subclassing) becomes a part of the ES262 specification.
+This TS/JS wrapper will need to be rewritten if/when the [TC39 remove builtin subclassing proposal](https://github.com/tc39/proposal-rm-builtin-subclassing) becomes a part of the ES262 specification.
 
 TODO: API here, type defs, methodology, etc.
