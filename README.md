@@ -6,8 +6,6 @@ This library depends on bleeding edge and experimental JavaScript and WebAssembl
 
 Everything is written in a browser compatible fashion, meaning that it can run in any environment that supports all static WebAssembly functions, fetch, WeakRefs, private class fields, and Wasm SIMD. It should run in the newest version of Deno, the latest Node.js, or any modern browser.
 
-Most of the .wat was compiled from C++, then hand-edited afterward for micro-optimizations.
-
 **Warning**:
 This TS/JS wrapper will need to be rewritten if/when the [TC39 remove builtin subclassing proposal](https://github.com/tc39/proposal-rm-builtin-subclassing) becomes a part of the ES262 specification.
 
