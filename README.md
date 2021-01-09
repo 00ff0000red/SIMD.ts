@@ -27,7 +27,8 @@ The module exports 10 classes:
 
 Each of the classes are based on typedarrays.
 Once constructed, each will only have the number after the "x" indexable elements.
-Ex:
+
+Example:
 ```ts
 const vector = new Float64x2;
 
@@ -55,10 +56,13 @@ fullVector[3]; // 100
 ```
 
 Unless otherwise stated, every part of module uses runtime builtins or WebAssembly function calls in order to work.
+
 There are currently no scalar operations, but some polyfills may require them, and will be documented as such.
+
 Even if using scalar operations, they should execute faster than plain JavaScript, as they will only be on the WebAssembly side.
 
 All vectors have methods shaped after the normal JavaScript operations.
+
 They are literally stringified versions of the normal operations.
 
 ```ts
@@ -88,10 +92,11 @@ console.log(
 ```
 Most operations are overloaded to accept either, a second vector as their argument, or their argument is casted to a number.
 
-Errors:
+## Errors: ##
+
 Attempting to perform a vector operation on a non-vector will throw an exception.
 ```ts
-Uint8x16.prototype["+"].call(new Uint8Array(...), ...); // Error!
+Uint8x16.prototype["+"].call(new Uint8Array(...), ...); // TypeError!
 ```
 
 Vectors may not be mixed:
@@ -101,6 +106,7 @@ const y = Float32x4.splat(5);
 x["+"](y); // probably Int32x4 [ 5, 5, 5, 5 ]
 ```
 This is because, if the second arguemnt is not of the same type, then it is coerced into a number.
+
 In that particular case, the entire object was coerced into number, (`NaN`), then casted to an int32 (`0`).
 
 Calling `.of` or `.from` with too many values, or too long of an iterator respectively, should throw an exception:
