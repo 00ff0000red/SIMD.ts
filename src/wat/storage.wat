@@ -1,7 +1,7 @@
 ;; storage
 
 (import "wasm" "clear_and_calculate_offset" (func $clear_and_calculate_offset (param i32) (result i32))) ;; (usize): (usize)
-(memory (export "memory") 1 1)
+(memory (export "storage") 1 1) ;; let storage = bool mut*
 (func (export "calculate_allocation") (result i32) ;; (): (usize)
 	(local i32)
 	i32.const 0
