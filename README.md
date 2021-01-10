@@ -91,6 +91,14 @@ console.log(
 ```
 Most operations are overloaded to accept either, a second vector as their argument, or their argument is cast to a number.
 
+Some unary methods are provided, such as `.abs`, `.~`, `.neg`.
+
+```ts
+const decimalVector = SIMD.Float32x4.of(1.1, 2.2, 3.3, 4.4);
+
+console.log(decimalVector.floor()); // Float32x4 [ 1, 2, 3, 4 ]
+```
+
 ## Errors: ##
 
 Attempting to perform a vector operation on a non-vector will throw an exception.
@@ -108,7 +116,7 @@ This is because, if the second argument is not of the same type, it is then coer
 
 In that particular case, the entire object was coerced into a number, (`NaN`), then cast to an int32 (`0`).
 
-Calling `.of` or `.from` with too many values, or too long of an iterator respectively, should throw an exception:
+Calling `.of` or `.from` with too many values, or too long of an iterator, respectively, should throw an exception:
 ```ts
 Int32x4.of(1, 2, 3, 4, 5); // error `5` would otherwise be lost
 ```
