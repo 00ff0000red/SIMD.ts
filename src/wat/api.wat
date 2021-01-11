@@ -6,3 +6,7 @@
 	i32.const 4 ;; equivalent to * 16; to offset loading a v128
 	i32.shl
 )
+
+(func (export "unreachable")
+	unreachable
+)
