@@ -6,20 +6,17 @@ This library depends on bleeding edge and experimental JavaScript and WebAssembl
 
 Everything is written in a browser-compatible fashion, meaning that it can run in any environment that supports all static WebAssembly functions, fetch, WeakRefs, private class fields, and Wasm SIMD. It should run in the newest version of Deno, the latest Node.js, or any modern browser.
 
-**Warning**:
-This TS/JS wrapper will need to be rewritten if/when the [TC39 remove builtin subclassing proposal](https://github.com/tc39/proposal-rm-builtin-subclassing) becomes a part of the ES262 specification.
-
 The module exports 10 classes:
-* Uint8x16
-* Uint16x8
-* Uint32x4
-* Uint64x2
-* Int8x16
-* Int16x8
-* Int32x4
-* Int64x2
-* Float32x4
-* Float64x2
+* `Uint8x16`
+* `Uint16x8`
+* `Uint32x4`
+* `Uint64x2`
+* `Int8x16`
+* `Int16x8`
+* `Int32x4`
+* `Int64x2`
+* `Float32x4`
+* `Float64x2`
 
 (*clamped versions may be added later*)
 
@@ -37,10 +34,10 @@ vector[2]; // undefined
 ```
 
 The constructors take no arguments, leaving four different ways to create a vector:
-* new TxN
-* TxN.of(...)
-* TxN.from(...)
-* TxN.splat(T)
+* `new TxN`
+* `TxN.of(...)`
+* `TxN.from(...)`
+* `TxN.splat(T)`
 
 `.of`, and `.from` are inherited from the builtin `%TypedArray%`, `TxN.splat` creates a vector full of a single value.
 
@@ -54,7 +51,7 @@ fullVector[2]; // 100
 fullVector[3]; // 100
 ```
 
-Unless otherwise stated, every part of the module uses runtime builtins or WebAssembly function calls to work.
+Unless otherwise stated, every part of the module uses JS runtime builtins or WebAssembly function calls to work.
 
 There are currently no scalar operations, but some polyfills may require them and will be documented as such.
 
@@ -99,11 +96,22 @@ const decimalVector = SIMD.Float32x4.of(1.1, 2.2, 3.3, 4.4);
 console.log(decimalVector.floor()); // Float32x4 [ 1, 2, 3, 4 ]
 ```
 
+To start, only built-in Wasm SIMD operations will be supported, but more operations will be added once the code is stable.
+For example, a vectorized square operation could easily be added that would have the semantics of the following:
+```ts
+const vector = TxN.of(2, 3, 4, 5);
+const squared = vector["*"](vector); // [ 4, 9, 16, 25 ]
+```
+but without the temporary variable, and the overhead of moving through JS-Wasm twice.
+```ts
+const squared = TxN.of(...).square(); // [ 4, 9, 16, 25 ]
+```
+
 ## Errors: ##
 
 Attempting to perform a vector operation on a non-vector will throw an exception.
 ```ts
-Uint8x16.prototype["+"].call(new Uint8Array(...), ...); // TypeError!
+Uint8x16.prototype["+"].call(new Uint8Array(...), ...); // WebAssembly.RuntimeError { message: "This is not a Uint8x16", ... }
 ```
 
 Vectors may not be mixed:
@@ -123,6 +131,9 @@ Int32x4.of(1, 2, 3, 4, 5); // error `5` would otherwise be lost
 (*this may change later*)
 
 Uint64x2 and Int64x2 have very few Wasm operations, so they will likely have to be filled in with scalar operations.
+
+**Warning**:
+This TS/JS wrapper will need to be rewritten if/when the [TC39 remove builtin subclassing proposal](https://github.com/tc39/proposal-rm-builtin-subclassing) becomes a part of the ES262 specification.
 
 <!--
 See the [docs](./docs/index.md) for more specific details on the specific operations currently implemented for each vector type.
