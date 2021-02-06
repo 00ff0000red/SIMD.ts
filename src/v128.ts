@@ -22,12 +22,15 @@ TODO: add a module to replace the control flow that is currently in JS; maybe ex
 */
 
 import {
-	i32,
-	f32,
-	i64,
-	f64,
+	u8, s8,
+	u16, s16,
+	i32, u32, s32,
+	i64, u64, s64,
+	f32, f64,
 	usize
 } from "./low-level-types.ts";
+
+import { TupleOf } from "./tuple-of.ts";
 
 // for instantiating Wasm
 const fetch_mapper = async (file_name: string): Promise<ArrayBuffer> => (
@@ -47,6 +50,7 @@ const instantiate = async (
 )).instance.exports;
 
 // read all Wasm files
+// responses are loading in parallel before being instantiated
 const [
 	memory_file,
 	storage_file,
@@ -64,18 +68,24 @@ const [
 const memory_mod = await instantiate(
 	memory_file
 ) as {
-	memory: WebAssembly.Memory
+	memory: WebAssembly.Memory,
+	clear_and_calculate_offset: (_: usize) => (usize)
 };
 
+// imports wasm.clear_and_calculate_offset
 const storage_mod = await instantiate(
 	storage_file, {
 		wasm: memory_mod
 		// throw: () => { throw new RangeError("Array buffer allocation failed"); };
 	}
 ) as {
+	storage: WebAssembly.Memory, // Memory(1, 1)
+	// why is `storage` exported?
 	calculate_allocation: () => usize,
 	memory_free: (ptr: usize) => void
 };
+
+type Class = new (...args: any) => any;
 
 const api_mod = await instantiate(
 	api_file, {
@@ -85,13 +95,68 @@ const api_mod = await instantiate(
 		},
 		Reflect,
 		js: {
-			arguments: [ memory_mod.memory.buffer, 0 | 0 ] // VM hint to i32?
 			// [ ArrayBuffer, i32 ]
+			arguments: [ memory_mod.memory.buffer, 0 | 0 ] as unknown as WebAssembly.ImportValue
+			// (0 | 0) VM hint toward i32 representaton?
+			// unknown cast because typings don't include externref or funcref yet
 		}
 	}
 ) as {
-	unreachable: () => never
+	unreachable: () => never,
+	load_all_classes: (..._: TupleOf<Function, 10>) => void,
+	// TODO: de-duplicate, use a generic type alias
+	"u8x16.of": <T extends Class>(this: T, ..._: TupleOf<u8, 16>) => InstanceType<typeof this>,
+	"s8x16.of": <T extends Class>(this: T, ..._: TupleOf<s8, 16>) => InstanceType<typeof this>,
+	"u16x8.of": <T extends Class>(this: T, ..._: TupleOf<u16, 8>) => InstanceType<typeof this>,
+	"s16x8.of": <T extends Class>(this: T, ..._: TupleOf<s16, 8>) => InstanceType<typeof this>,
+	"u32x4.of": <T extends Class>(this: T, ..._: TupleOf<u32, 4>) => InstanceType<typeof this>,
+	"s32x4.of": <T extends Class>(this: T, ..._: TupleOf<s32, 4>) => InstanceType<typeof this>,
+	"u64x2.of": <T extends Class>(this: T, ..._: TupleOf<u64, 2>) => InstanceType<typeof this>,
+	"s64x2.of": <T extends Class>(this: T, ..._: TupleOf<s64, 2>) => InstanceType<typeof this>,
+	"f32x4.of": <T extends Class>(this: T, ..._: TupleOf<f32, 4>) => InstanceType<typeof this>,
+	"f64x4.of": <T extends Class>(this: T, ..._: TupleOf<f64, 2>) => InstanceType<typeof this>,
+
+	"u8x16.splat": <T extends Class>(this: T, _: u8) => InstanceType<typeof this>
+	"s8x16.splat": <T extends Class>(this: T, _: s8) => InstanceType<typeof this>
+	"u16x8.splat": <T extends Class>(this: T, _: u16) => InstanceType<typeof this>
+	"s16x8.splat": <T extends Class>(this: T, _: s16) => InstanceType<typeof this>
+	"u32x4.splat": <T extends Class>(this: T, _: u32) => InstanceType<typeof this>
+	"s32x4.splat": <T extends Class>(this: T, _: s32) => InstanceType<typeof this>
+	"u64x2.splat": <T extends Class>(this: T, _: u64) => InstanceType<typeof this>
+	"s64x2.splat": <T extends Class>(this: T, _: s64) => InstanceType<typeof this>
+	"f32x4.splat": <T extends Class>(this: T, _: f32) => InstanceType<typeof this>
+	"f64x2.splat": <T extends Class>(this: T, _: f64) => InstanceType<typeof this>
 };
+
+/*type $i8x16<T extends i8, Class> = (..._: TupleOf<T, 16>) => Class
+"u8x16.of": $i8x16<u8, Uint8x16>
+"s8x16.of": $i8x16<s8, Int8x16>
+
+type $i16x8<T extends i16, Class> = (..._: TupleOf<T, 8>) => Class
+"u16x8.of": $i16x8<u16, Uint16x8>
+"s16x8.of": $i16x8<s16, Int16x8>
+
+type $i32x4<T extends i32, Class> = (..._: TupleOf<T, 4>) => Class
+"u32x4.of": $i32x4<u32, Uint32x4>
+"s32x4.of": $i32x4<s32, Int32x4>
+
+type $i64x2<T extends i64, Class> = (..._: TupleOf<T, 2>) => Class
+"u64x2.of": $i64x2<u64, Uint64x2>
+"s64x2.of" $i64x2<s64, Int64x2>
+
+"f32x4.of": (..._: TupleOf<f32, 4>) => Float32x4
+"f32x4.of": (..._: TupleOf<f64, 2>) => Float64x2
+
+"u8x16.splat": (_: u8) => Uint8x16
+"s8x16.splat": (_: s8) => Int8x16
+"u16x8.splat": (_: u16) => Uint16x8
+"s16x8.splat": (_: s16) => Int16x8
+"u32x4.splat": (_: u32) => Uint32x4
+"s32x4.splat": (_: s32) => Int32x4
+"u64x2.splat": (_: u64) => Uint64x2
+"s64x2.splat": (_: s64) => Int64x2
+"f32x4.splat": (_: f32) => Float32x4
+"f64x2.splat": (_: f64) => Float64x2*/
 
 type wasm_t = i32 | f32 | i64 | f64 | usize;
 
