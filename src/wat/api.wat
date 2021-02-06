@@ -2,15 +2,17 @@
 
 (import "wasm" "calculate_allocation" (func $calculate_allocation (result i32))) ;; (): (usize)
 (import "wasm" "memory" (memory 4 4))
-(import "Reflect" "construct" (func $Reflect::construct (param $target externref) (param $argumentsList externref) (result externref)))
-(import "Reflect" "set" (func $Reflect::set (param externref i32 i32)))
+(import "Reflect" "construct" (func $Reflect::construct (param $target externref) (param $argumentsList externref) (result externref))) ;; <T : V128>(target: T, argumentsList: JSValue::Array): (new<T>)
+(import "Reflect" "set" (func $Reflect::set (param externref i32 i32))) ;; (JSValue::Array usize usize): ()
 (import "js" "arguments" (global $arguments externref)) ;; JSValue::Array [ ArrayBuffer, i32 ]
+;; `arguments` is a staticially allocated, reused array
 
-(func (export "unreachable")
+;; for use on the JS side
+(func (export "unreachable") ;; (): !
 	unreachable
 )
 
-(func $construct_from (param $ptr i32) (param $class externref) (result externref)
+(func $construct_from (param $ptr i32) (param $class externref) (result externref) ;; (usize T): (new<T>)
 	global.get $arguments
 	i32.const 1
 	local.get $ptr
@@ -27,7 +29,7 @@
 	local.get 0
 )
 
-;; set once after construction
+;; set only once after construction; semanticially constant
 (global $u8x16 (mut externref) ref.null extern)
 (global $s8x16 (mut externref) ref.null extern)
 
@@ -89,6 +91,7 @@
 )
 
 ;; TxN.of
+;; TODO: inline these, remove the extra functions, optimize
 
 (type $i8x16 (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result externref)))
 (func $i8x16.of (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)
