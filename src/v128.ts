@@ -18,18 +18,26 @@ storage
    |
   ops
 
-add a module to replace the control flow that is currently in JS
+TODO: add a module to replace the control flow that is currently in JS; maybe expose a static `is(x: unknown): x is T` on each class, and pass into Wasm?
 */
+
+import {
+	i32,
+	f32,
+	i64,
+	f64,
+	usize
+} from "./low-level-types.ts";
 
 // for instantiating Wasm
 const fetch_mapper = async (file_name: string): Promise<ArrayBuffer> => (
 	await fetch(
-		// TODO: fix this
+		// TODO: don't do this
 		`https://github.com/00ff0000red/SIMD.ts/blob/main/src/bin/${file_name}.wasm?raw=true`
 	)
 ).arrayBuffer();
 
-// when Deno has WebAssembly.{compileStreaming, instantiateStreaming} update this
+// TODO: update this when Deno has working WebAssembly.{compileStreaming, instantiateStreaming}
 const instantiate = async (
 	promise_buffer: Promise<ArrayBuffer>,
 	imports?: Parameters<typeof WebAssembly.instantiate>[1]
@@ -49,9 +57,7 @@ const [
 	"storage",
 	"api",
 	"ops"
-].map(
-	fetch_mapper
-);
+].map(fetch_mapper);
 
 // instantiate
 
@@ -64,26 +70,28 @@ const memory_mod = await instantiate(
 const storage_mod = await instantiate(
 	storage_file, {
 		wasm: memory_mod
+		// throw: () => { throw new RangeError("Array buffer allocation failed"); };
 	}
 ) as {
-	memory_free: (n: number) => void
+	calculate_allocation: () => usize,
+	memory_free: (ptr: usize) => void
 };
 
 const api_mod = await instantiate(
 	api_file, {
-		wasm: storage_mod
+		wasm: {
+			calculate_allocation: storage_mod.calculate_allocation,
+			memory: memory_mod.memory
+		},
+		Reflect,
+		js: {
+			arguments: [ memory_mod.memory.buffer, 0 | 0 ] // VM hint to i32?
+			// [ ArrayBuffer, i32 ]
+		}
 	}
 ) as {
-	memory_allocate: () => number
+	unreachable: () => never
 };
-
-import {
-	i32,
-	f32,
-	i64,
-	f64,
-	usize
-} from "./low-level-types.ts";
 
 type wasm_t = i32 | f32 | i64 | f64 | usize;
 
@@ -120,6 +128,8 @@ type $unary = wasm_func<[], usize>;
 type $unary_assign = wasm_func<[], void>;
 
 /*
+TODO: move this to docs or somewhere else
+
 $op
 takes an lhs (&v128) and rhs (&v128) and returns a reference to a newly allocated v128
 ex:
@@ -185,10 +195,11 @@ lhs + rhs;
 => &(39179, 2739, 13820, 414)
 */
 
+// TODO: implement missing operations, such as single parameter, splatting bit-wise operations. Ex: { new TxN(...)["&="](5) }
 const ops_mod = await instantiate(
 	ops_file, {
 		wasm: {
-			alloc: api_mod.memory_allocate,
+			alloc: storage_mod.calculate_allocation,
 			memory: memory_mod.memory
 		}
 	}
@@ -593,10 +604,115 @@ const ops_mod = await instantiate(
 	"i8x16.single.max_u=": $op_i32_assign
 };
 
-export const free = storage_mod.memory_free;
+export const {
+	calculate_allocation: allocate,
+	memory_free: free
+} = storage_mod;
 
 export const memory = memory_mod.memory.buffer;
 
-export const allocate = api_mod.memory_allocate;
+export const {
+	unreachable
+} = api_mod;
 
-export { ops_mod as ops };
+export {
+	api_mod as api,
+	ops_mod as ops
+};
+
+export interface SIMD<T, num_t extends number | bigint, N extends usize> {
+	readonly buffer: never;
+	readonly byteOffset: never;
+
+	// of: (...args: TupleOf<num_t | undefined, N>) => Uint8x16;
+	// from: (args: TupleOf<num_t | undefined, N>) => Uint8x16;
+
+	// new(): this;
+
+	"+"?(rhs: T | num_t): T;
+	"+="?(rhs: T | num_t): this;
+	"-"?(rhs: T | num_t): T;
+	"-="?(rhs: T | num_t): this;
+	"*"?(rhs: T | num_t): T;
+	"*="?(rhs: T | num_t): this;
+
+	"/"?(rhs: T | num_t): T;
+	"/="?(rhs: T | num_t): this;
+	">>"?(rhs: num_t): T;
+	">>="?(rhs: num_t): this;
+	"<<"?(rhs: num_t): T;
+	"<<="?(rhs: num_t): this;
+	"min"?(rhs: T | num_t): T;
+	"min="?(rhs: T | num_t): this;
+	"max"?(rhs: T | num_t): T;
+	"max="?(rhs: T | num_t): this;
+	"neg"?(rhs: T | num_t): T;
+	"neg="?(rhs: T | num_t): this;
+	"abs"?(rhs: T | num_t): T;
+	"abs="?(rhs: T | num_t): this;
+	"&"?(rhs: T | num_t): T;
+	"&="?(rhs: T | num_t): this;
+	"|"?(rhs: T | num_t): T;
+	"|="?(rhs: T | num_t): this;
+	"^"?(rhs: T | num_t): T;
+	"^="?(rhs: T | num_t): this;
+	"~"?(): T;
+	"~="?(): this;
+	"=="?(rhs: T | num_t): SIMD<T, num_t, N>;
+	// "==="?(rhs: T | num_t): this;
+	// assigning equality...?
+	"!="?(rhs: T | num_t): SIMD<T, num_t, N>;
+	// "!=="?(rhs: T | num_t): this;
+	// assigning inequality
+
+	// assigning variants of both exist
+	"<"?(rhs: T | num_t): SIMD<T, num_t, N>;
+	"<="?(rhs: T | num_t): SIMD<T, num_t, N>;
+
+	">"?(rhs: T | num_t): SIMD<T, num_t, N>;
+	">="?(rhs: T | num_t): SIMD<T, num_t, N>;
+
+	"pmin"?(rhs: T | num_t): T;
+	"pmin="?(rhs: T | num_t): this;
+	"pmax"?(rhs: T | num_t): T;
+	"pmax="?(rhs: T | num_t): this;
+
+	"sqrt"?(): T;
+	"sqrt="?(): this;
+
+	"ceil"?(): T;
+	"ceil="?(): this;
+
+	"floor"?(): T;
+	"floor="?(): this;
+
+	"trunc"?(): T;
+	"trunc="?(): this;
+
+	// is this nint?
+	"nearest"?(): T;
+	"nearest="?(): this;
+}
+
+declare class FinalizationRegistry<
+	Target extends object,
+	Value,
+	Key extends object | undefined
+> {
+	register(
+		target: Target,
+		callback_val?: Value,
+		deregister_key?: Key
+	): void;
+
+	constructor(callback: (input: Value) => void);
+};
+
+"hide source";
+const GarbageCollector = class extends FinalizationRegistry<SIMD<unknown, number | bigint, 16 | 8 | 4 | 2>, usize, undefined> {}
+
+// in case of prototype corruption
+GarbageCollector.prototype.register = FinalizationRegistry.prototype.register;
+
+export const garbageCollector = new GarbageCollector(free);
+// calls Wasm `free` to mark the vector's memory as free, and clears memory with zeros
