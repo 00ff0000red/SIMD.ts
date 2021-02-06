@@ -94,7 +94,7 @@
 ;; TODO: inline these, remove the extra functions, optimize
 
 (type $i8x16 (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result externref)))
-(func $i8x16.of (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)
+(func (export "u8x16.of") (type $i8x16)
 	call $calculate_allocation
 	call $dup
 	v128.const i8x16 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -131,54 +131,53 @@
 	local.get 15
 	i8x16.replace_lane 15
 	v128.store
-)
-
-(func (export "u8x16.of") (type $i8x16)
-	local.get 0
-	local.get 1
-	local.get 2
-	local.get 3
-  	local.get 4
-	local.get 5
-	local.get 6
-	local.get 7
-	local.get 8
-	local.get 9
-	local.get 10
-	local.get 11
-  	local.get 12
-	local.get 13
-	local.get 14
-	local.get 15
-	call $i8x16.of
 	global.get $u8x16
 	return_call $construct_from
 )
 
 (func (export "s8x16.of") (type $i8x16)
+	call $calculate_allocation
+	call $dup
+	v128.const i8x16 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 	local.get 0
+	i8x16.replace_lane 0
 	local.get 1
+	i8x16.replace_lane 1
 	local.get 2
+	i8x16.replace_lane 2
 	local.get 3
+	i8x16.replace_lane 3
   	local.get 4
+	i8x16.replace_lane 4
 	local.get 5
+	i8x16.replace_lane 5
 	local.get 6
+	i8x16.replace_lane 6
 	local.get 7
+	i8x16.replace_lane 7
 	local.get 8
+	i8x16.replace_lane 8
 	local.get 9
+	i8x16.replace_lane 9
 	local.get 10
+	i8x16.replace_lane 10
 	local.get 11
+	i8x16.replace_lane 11
   	local.get 12
+	i8x16.replace_lane 12
 	local.get 13
+	i8x16.replace_lane 13
 	local.get 14
+	i8x16.replace_lane 14
 	local.get 15
-	call $i8x16.of
+	i8x16.replace_lane 15
+	v128.store
 	global.get $s8x16
 	return_call $construct_from
 )
 
 (type $i16x8 (func (param i32 i32 i32 i32 i32 i32 i32 i32) (result externref)))
-(func $i16x8.of (param i32 i32 i32 i32 i32 i32 i32 i32) (result i32)
+(func (export "u16x8.of") (type $i16x8)
 	call $calculate_allocation
 	call $dup
 	v128.const i16x8 0 0 0 0 0 0 0 0
@@ -199,38 +198,37 @@
 	local.get 7
 	i16x8.replace_lane 7
 	v128.store
-)
-
-(func (export "u16x8.of") (type $i16x8)
-	local.get 0
-	local.get 1
-	local.get 2
-	local.get 3
-  	local.get 4
-	local.get 5
-	local.get 6
-	local.get 7
-	call $i16x8.of
 	global.get $u16x8
 	return_call $construct_from
 )
 
 (func (export "s16x8.of") (type $i16x8)
+	call $calculate_allocation
+	call $dup
+	v128.const i16x8 0 0 0 0 0 0 0 0
 	local.get 0
+	i16x8.replace_lane 0
 	local.get 1
+	i16x8.replace_lane 1
 	local.get 2
+	i16x8.replace_lane 2
 	local.get 3
+	i16x8.replace_lane 3
   	local.get 4
+	i16x8.replace_lane 4
 	local.get 5
+	i16x8.replace_lane 5
 	local.get 6
+	i16x8.replace_lane 6
 	local.get 7
-	call $i16x8.of
+	i16x8.replace_lane 7
+	v128.store
 	global.get $s16x8
 	return_call $construct_from
 )
 
 (type $i32x4 (func (param i32 i32 i32 i32) (result externref)))
-(func $i32x4.of (param i32 i32 i32 i32) (result i32)
+(func (export "u32x4.of") (type $i32x4)
 	call $calculate_allocation
 	call $dup
 	v128.const i32x4 0 0 0 0
@@ -243,30 +241,29 @@
 	local.get 3
 	i32x4.replace_lane 3
 	v128.store
-)
-
-(func (export "u32x4.of") (type $i32x4)
-	local.get 0
-	local.get 1
-	local.get 2
-	local.get 3
-	call $i32x4.of
 	global.get $u32x4
 	return_call $construct_from
 )
 
 (func (export "s32x4.of") (type $i32x4)
+	call $calculate_allocation
+	call $dup
+	v128.const i32x4 0 0 0 0
 	local.get 0
+	i32x4.replace_lane 0
 	local.get 1
+	i32x4.replace_lane 1
 	local.get 2
+	i32x4.replace_lane 2
 	local.get 3
-	call $i32x4.of
+	i32x4.replace_lane 3
+	v128.store
 	global.get $s32x4
 	return_call $construct_from
 )
 
 (type $i64x2 (func (param i64 i64) (result externref)))
-(func $i64x2.of (param i64 i64) (result i32)
+(func (export "u64x2.of") (type $i64x2)
 	call $calculate_allocation
 	call $dup
 	v128.const i64x2 0 0
@@ -275,26 +272,25 @@
 	local.get 1
 	i64x2.replace_lane 1
 	v128.store
-)
-
-(func (export "u64x2.of") (type $i64x2)
-	local.get 0
-	local.get 1
-	call $i64x2.of
 	global.get $u64x2
 	return_call $construct_from
 )
 
 (func (export "s64x2.of") (type $i64x2)
+	call $calculate_allocation
+	call $dup
+	v128.const i64x2 0 0
 	local.get 0
+	i64x2.replace_lane 0
 	local.get 1
-	call $i64x2.of
+	i64x2.replace_lane 1
+	v128.store
 	global.get $s64x2
 	return_call $construct_from
 )
 
 (type $f32x4 (func (param f32 f32 f32 f32) (result externref)))
-(func $f32x4.of (param f32 f32 f32 f32) (result i32)
+(func (export "f32x4.of") (type $f32x4)
 	call $calculate_allocation
 	call $dup
 	v128.const f32x4 0.0 0.0 0.0 0.0
@@ -307,20 +303,12 @@
 	local.get 3
 	f32x4.replace_lane 3
 	v128.store
-)
-
-(func (export "f32x4.of") (type $f32x4)
-	local.get 0
-	local.get 1
-	local.get 2
-	local.get 3
-	call $f32x4.of
 	global.get $f32x4
 	return_call $construct_from
 )
 
 (type $f64x2 (func (param f64 f64) (result externref)))
-(func $f64x2.of (param f64 f64) (result i32)
+(func (export "f64x2.of") (type $f64x2)
 	call $calculate_allocation
 	call $dup
 	v128.const f64x2 0.0 0.0
@@ -329,144 +317,108 @@
 	local.get 1
 	f64x2.replace_lane 1
 	v128.store
-)
-
-(func (export "f64x2.of") (type $f64x2)
-	local.get 0
-	local.get 1
-	call $f64x2.of
 	global.get $f64x2
 	return_call $construct_from
 )
 
 ;; TxN.splat
 
-(func $i8x16.splat (param i32) (result i32)
+(func (export "u8x16.splat") (param i32) (result externref)
 	call $calculate_allocation
 	call $dup
-
 	local.get 0
 	i8x16.splat
-
 	v128.store
-)
-
-(func (export "u8x16.splat") (param i32) (result externref)
-	local.get 0
-	call $i8x16.splat
 	global.get $u8x16
 	return_call $construct_from
 )
 
 (func (export "s8x16.splat") (param i32) (result externref)
+	call $calculate_allocation
+	call $dup
 	local.get 0
-	call $i8x16.splat
+	i8x16.splat
+	v128.store
 	global.get $s8x16
 	return_call $construct_from
 )
 
-(func $i16x8.splat (param i32) (result i32)
+(func (export "u16x8.splat") (param i32) (result externref)
 	call $calculate_allocation
 	call $dup
-
 	local.get 0
 	i16x8.splat
-
 	v128.store
-)
-
-(func (export "u16x8.splat") (param i32) (result externref)
-	local.get 0
-	call $i16x8.splat
 	global.get $u16x8
 	return_call $construct_from
 )
 
 (func (export "s16x8.splat") (param i32) (result externref)
+	call $calculate_allocation
+	call $dup
 	local.get 0
-	call $i16x8.splat
+	i16x8.splat
+	v128.store
 	global.get $s16x8
 	return_call $construct_from
 )
 
-(func $i32x4.splat (param i32) (result i32)
+(func (export "u32x4.splat") (param i32) (result externref)
 	call $calculate_allocation
 	call $dup
-
 	local.get 0
 	i32x4.splat
-
 	v128.store
-)
-
-(func (export "u32x4.splat") (param i32) (result externref)
-	local.get 0
-	call $i32x4.splat
 	global.get $u32x4
 	return_call $construct_from
 )
 
 (func (export "s32x4.splat") (param i32) (result externref)
+	call $calculate_allocation
+	call $dup
 	local.get 0
-	call $i32x4.splat
+	i32x4.splat
+	v128.store
 	global.get $s32x4
 	return_call $construct_from
 )
 
-(func $i64x2.splat (param i64) (result i32)
+(func (export "u64x2.splat") (param i64) (result externref)
 	call $calculate_allocation
 	call $dup
-
 	local.get 0
 	i64x2.splat
-
 	v128.store
-)
-
-(func (export "u64x2.splat") (param i64) (result externref)
-	local.get 0
-	call $i64x2.splat
 	global.get $u64x2
 	return_call $construct_from
 )
 
 (func (export "s64x2.splat") (param i64) (result externref)
+	call $calculate_allocation
+	call $dup
 	local.get 0
-	call $i64x2.splat
+	i64x2.splat
+	v128.store
 	global.get $s64x2
 	return_call $construct_from
 )
 
-(func $f32x4.splat (param f32) (result i32)
+(func (export "f32x4.splat") (param f32) (result externref)
 	call $calculate_allocation
 	call $dup
-
 	local.get 0
 	f32x4.splat
-
 	v128.store
-)
-
-(func (export "f32x4.splat") (param f32) (result externref)
-	local.get 0
-	call $f32x4.splat
 	global.get $f32x4
 	return_call $construct_from
 )
 
-(func $f64x2.splat (param f64) (result i32)
+(func (export "f64x2.splat") (param f64) (result externref)
 	call $calculate_allocation
 	call $dup
-
 	local.get 0
 	f64x2.splat
-
 	v128.store
-)
-
-(func (export "f64x2.splat") (param f64) (result externref)
-	local.get 0
-	call $f64x2.splat
 	global.get $f64x2
 	return_call $construct_from
 )
