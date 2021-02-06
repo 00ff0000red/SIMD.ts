@@ -2,7 +2,7 @@
 
 (import "wasm" "clear_and_calculate_offset" (func $clear_and_calculate_offset (param i32) (result i32))) ;; (usize): (usize)
 (memory (export "storage") 1 1) ;; bool[0x10000]
-(func (export "calculate_allocation") (result i32) ;; (): (usize)
+(func (export "calculate_allocation") (result i32) ;; (usize): ()
 	(local i32)
 	i32.const 0
 	local.set 0
