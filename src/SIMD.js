@@ -309,10 +309,8 @@ these are scary
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 16);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 16),
 			this.#ptr = ptr
 		);
 /*
@@ -385,10 +383,8 @@ const Int8x16 = class extends Int8Array {
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 16);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 16),
 			this.#ptr = ptr
 		);
 	}
@@ -611,10 +607,8 @@ const Uint16x8 = class extends Uint16Array {
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 8);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 8),
 			this.#ptr = ptr
 		);
 	}
@@ -651,10 +645,8 @@ const Int16x8 = class extends Int16Array {
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 8);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 8),
 			this.#ptr = ptr
 		);
 	}
@@ -784,10 +776,8 @@ const Uint32x4 = class extends Uint32Array {
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 4);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 4),
 			this.#ptr = ptr
 		);
 	}
@@ -840,10 +830,8 @@ const Int32x4 = class extends Int32Array {
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 4);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 4),
 			this.#ptr = ptr
 		);
 	}
@@ -914,10 +902,8 @@ const Uint64x2 = class extends Uint64Array {
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 2);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 2),
 			this.#ptr = ptr
 		);
 	}
@@ -954,10 +940,8 @@ const Int64x2 = class extends Int64Array {
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 2);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 2),
 			this.#ptr = ptr
 		);
 	}
@@ -1276,10 +1260,8 @@ const Float32x4 = class extends Float32Array {
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 4);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 4),
 			this.#ptr = ptr
 		);
 	}
@@ -1582,10 +1564,8 @@ const Float64x2 = class extends Float64Array {
 			? byteOffset
 			: allocate();
 
-		super(memory, ptr, 2);
-
 		garbageCollector.register(
-			this,
+			super(memory, ptr, 2),
 			this.#ptr = ptr
 		);
 	}
