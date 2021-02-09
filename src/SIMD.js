@@ -45,7 +45,7 @@ const Uint8x16 = class extends Uint8Array {
 		const ptr = Uint8x16.#instanceof(this, rhs)
 			? ops["v128.and"](this.#ptr, rhs.#ptr)
 			: unreachable();
-			// ops["v128.single.and"](this.#ptr, rhs);
+			// ops["v128.single.and"](this.#ptr, +rhs);
 
 		// single ops are missing, fill these in soon!
 
@@ -56,7 +56,7 @@ const Uint8x16 = class extends Uint8Array {
 		Uint8x16.#instanceof(this, rhs)
 			? ops["v128.and="](this.#ptr, rhs.#ptr)
 			: unreachable();
-			// ops["v128.single.and="](this.#ptr, rhs);
+			// ops["v128.single.and="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -65,7 +65,7 @@ const Uint8x16 = class extends Uint8Array {
 		const ptr = Uint8x16.#instanceof(this, rhs)
 			? ops["v128.or"](this.#ptr, rhs.#ptr)
 			: unreachable();
-			// ops["v128.single.or"](this.#ptr, rhs);
+			// ops["v128.single.or"](this.#ptr, +rhs);
 
 		return new Uint8x16(memory, ptr);
 	}
@@ -74,7 +74,7 @@ const Uint8x16 = class extends Uint8Array {
 		const ptr = Uint8x16.#instanceof(this, rhs)
 			? ops["v128.or="](this.#ptr, rhs.#ptr)
 			: unreachable();
-			// ops["v128.single.or="](this.#ptr, rhs);
+			// ops["v128.single.or="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -83,7 +83,7 @@ const Uint8x16 = class extends Uint8Array {
 		const ptr = Uint8x16.#instanceof(this, rhs)
 			? ops["v128.xor"](this.#ptr, rhs.#ptr)
 			: unreachable();
-			// ops["v128.single.or"](this.#ptr, rhs);
+			// ops["v128.single.or"](this.#ptr, +rhs);
 
 		return new Uint8x16(memory, ptr);
 	}
@@ -92,7 +92,7 @@ const Uint8x16 = class extends Uint8Array {
 		Uint8x16.#instanceof(this, rhs)
 			? ops["v128.xor="](this.#ptr, rhs.#ptr)
 			: unreachable();
-			// ops["v128.single.xor="](this.#ptr, rhs);
+			// ops["v128.single.xor="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -116,7 +116,7 @@ const Uint8x16 = class extends Uint8Array {
 	"+"(rhs) {
 		const ptr = Uint8x16.#instanceof(this, rhs)
 			? ops["i8x16.add"](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.add"](this.#ptr, rhs);
+			: ops["i8x16.single.add"](this.#ptr, +rhs);
 
 		return new Uint8x16(memory, ptr);
 	}
@@ -138,7 +138,7 @@ const Uint8x16 = class extends Uint8Array {
 	"+="(rhs) {
 		Uint8x16.#instanceof(this, rhs)
 			? ops["i8x16.add="](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.add="](this.#ptr, rhs);
+			: ops["i8x16.single.add="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -146,7 +146,7 @@ const Uint8x16 = class extends Uint8Array {
 	"-"(rhs) {
 		const ptr = Uint8x16.#instanceof(this, rhs)
 			? ops["i8x16.sub"](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.sub"](this.#ptr, rhs);
+			: ops["i8x16.single.sub"](this.#ptr, +rhs);
 
 		return new Uint8x16(memory, ptr);
 	}
@@ -154,7 +154,7 @@ const Uint8x16 = class extends Uint8Array {
 	"-="(rhs) {
 		Uint8x16.#instanceof(this, rhs)
 			? ops["i8x16.sub="](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.sub="](this.#ptr, rhs);
+			: ops["i8x16.single.sub="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -163,7 +163,7 @@ const Uint8x16 = class extends Uint8Array {
 		// assert self; ignore result in shift ops
 		Uint8x16.#instanceof(this, this);
 
-		const ptr = ops["i8x16.shift.shr_u"](this.#ptr, rhs);
+		const ptr = ops["i8x16.shift.shr_u"](this.#ptr, +rhs);
 
 		return new Uint8x16(memory, ptr);
 	}
@@ -171,7 +171,7 @@ const Uint8x16 = class extends Uint8Array {
 	">>="(rhs) {
 		Uint8x16.#instanceof(this, this);
 
-		ops["i8x16.shift.shr_u="](this.#ptr, rhs);
+		ops["i8x16.shift.shr_u="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -211,7 +211,7 @@ const Uint8x16 = class extends Uint8Array {
 	"<<"(rhs) {
 		Uint8x16.#instanceof(this, this);
 
-		const ptr = ops["i8x16.shift.shl"](this.#ptr, rhs);
+		const ptr = ops["i8x16.shift.shl"](this.#ptr, +rhs);
 
 		return new Uint8x16(memory, ptr);
 	}
@@ -219,7 +219,7 @@ const Uint8x16 = class extends Uint8Array {
 	"<<="(rhs) {
 		Uint8x16.#instanceof(this, this);
 
-		ops["i8x16.shift.shl="](this.#ptr, rhs);
+		ops["i8x16.shift.shl="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -272,7 +272,7 @@ these are scary
 	"min"(rhs) {
 		const ptr = Uint8x16.#instanceof(this, rhs)
 			? ops["i8x16.min_u"](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.min_u"](this.#ptr, rhs);
+			: ops["i8x16.single.min_u"](this.#ptr, +rhs);
 
 		return new Uint8x16(memory, ptr);
 	}
@@ -280,7 +280,7 @@ these are scary
 	"min="(rhs) {
 		Uint8x16.#instanceof(this, rhs)
 			? ops["i8x16.min_u="](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.min_u="](this.#ptr, rhs);
+			: ops["i8x16.single.min_u="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -288,7 +288,7 @@ these are scary
 	"max"(rhs) {
 		const ptr = Uint8x16.#instanceof(this, rhs)
 			? ops["i8x16.max_u"](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.max_u"](this.#ptr, rhs);
+			: ops["i8x16.single.max_u"](this.#ptr, +rhs);
 
 		return new Uint8x16(memory, ptr);
 	}
@@ -296,7 +296,7 @@ these are scary
 	"max="(rhs) {
 		Uint8x16.#instanceof(this, rhs)
 			? ops["i8x16.max_u="](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.max_u="](this.#ptr, rhs);
+			: ops["i8x16.single.max_u="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -306,7 +306,7 @@ these are scary
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
@@ -362,7 +362,7 @@ const Int8x16 = class extends Int8Array {
 	"+"(rhs) {
 		const ptr = Int8x16.#instanceof(this, rhs)
 			? ops["i8x16.add"](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.add"](this.#ptr, rhs);
+			: ops["i8x16.single.add"](this.#ptr, +rhs);
 
 		return new Int8x16(memory, ptr);
 	}
@@ -370,7 +370,7 @@ const Int8x16 = class extends Int8Array {
 	"+="(rhs) {
 		Int8x16.#instanceof(this, rhs)
 			? ops["i8x16.add="](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.add="](this.#ptr, rhs);
+			: ops["i8x16.single.add="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -380,7 +380,7 @@ const Int8x16 = class extends Int8Array {
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
@@ -416,7 +416,7 @@ const Uint16x8 = class extends Uint16Array {
 	"+"(rhs) {
 		const ptr = Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.add"](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.add"](this.#ptr, rhs);
+			: ops["i16x8.single.add"](this.#ptr, +rhs);
 
 		return new Uint16x8(memory, ptr);
 	}
@@ -424,7 +424,7 @@ const Uint16x8 = class extends Uint16Array {
 	"+="(rhs) {
 		Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.add="](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.add="](this.#ptr, rhs);
+			: ops["i16x8.single.add="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -432,7 +432,7 @@ const Uint16x8 = class extends Uint16Array {
 	"-"(rhs) {
 		const ptr = Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.sub"](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.sub"](this.#ptr, rhs);
+			: ops["i16x8.single.sub"](this.#ptr, +rhs);
 
 		return new Uint16x8(memory, ptr);
 	}
@@ -440,7 +440,7 @@ const Uint16x8 = class extends Uint16Array {
 	"-="(rhs) {
 		Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.sub="](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.sub="](this.#ptr, rhs);
+			: ops["i16x8.single.sub="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -448,7 +448,7 @@ const Uint16x8 = class extends Uint16Array {
 	"*"(rhs) {
 		const ptr = Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.mul"](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.mul"](this.#ptr, rhs);
+			: ops["i16x8.single.mul"](this.#ptr, +rhs);
 
 		return new Uint16x8(memory, ptr);
 	}
@@ -456,7 +456,7 @@ const Uint16x8 = class extends Uint16Array {
 	"*="(rhs) {
 		Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.mul="](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.mul="](this.#ptr, rhs);
+			: ops["i16x8.single.mul="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -464,7 +464,7 @@ const Uint16x8 = class extends Uint16Array {
 	">>"(rhs) {
 		Uint16x8.#instanceof(this, this);
 
-		const ptr = ops["i16x8.shift.shr_u"](this.#ptr, rhs);
+		const ptr = ops["i16x8.shift.shr_u"](this.#ptr, +rhs);
 
 		return new Uint16x8(memory, ptr);
 	}
@@ -472,7 +472,7 @@ const Uint16x8 = class extends Uint16Array {
 	">>="(rhs) {
 		Uint16x8.#instanceof(this, this);
 
-		ops["i16x8.shift.shr_u="](this.#ptr, rhs);
+		ops["i16x8.shift.shr_u="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -512,7 +512,7 @@ const Uint16x8 = class extends Uint16Array {
 	"<<"(rhs) {
 		Uint16x8.#instanceof(this, this);
 
-		const ptr = ops["i16x8.shift.shl"](this.#ptr, rhs);
+		const ptr = ops["i16x8.shift.shl"](this.#ptr, +rhs);
 
 		return new Uint16x8(memory, ptr);
 	}
@@ -520,7 +520,7 @@ const Uint16x8 = class extends Uint16Array {
 	"<<="(rhs) {
 		Uint16x8.#instanceof(this, this);
 
-		ops["i16x8.shift.shl="](this.#ptr, rhs);
+		ops["i16x8.shift.shl="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -570,7 +570,7 @@ const Uint16x8 = class extends Uint16Array {
 	"min"(rhs) {
 		const ptr = Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.min_u"](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.min_u"](this.#ptr, rhs);
+			: ops["i16x8.single.min_u"](this.#ptr, +rhs);
 
 		return new Uint16x8(memory, ptr);
 	}
@@ -578,7 +578,7 @@ const Uint16x8 = class extends Uint16Array {
 	"min="(rhs) {
 		Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.min_u="](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.min_u="](this.#ptr, rhs);
+			: ops["i16x8.single.min_u="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -586,7 +586,7 @@ const Uint16x8 = class extends Uint16Array {
 	"max"(rhs) {
 		const ptr = Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.max_u"](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.max_u"](this.#ptr, rhs);
+			: ops["i16x8.single.max_u"](this.#ptr, +rhs);
 
 		return new Uint16x8(memory, ptr);
 	}
@@ -594,7 +594,7 @@ const Uint16x8 = class extends Uint16Array {
 	"max="(rhs) {
 		Uint16x8.#instanceof(this, rhs)
 			? ops["i16x8.max_u="](this.#ptr, rhs.#ptr)
-			: ops["i16x8.single.max_u="](this.#ptr, rhs);
+			: ops["i16x8.single.max_u="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -604,7 +604,7 @@ const Uint16x8 = class extends Uint16Array {
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
@@ -642,7 +642,7 @@ const Int16x8 = class extends Int16Array {
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
@@ -678,7 +678,7 @@ const Uint32x4 = class extends Uint32Array {
 	"+"(rhs) {
 		const ptr = Uint32x4.#instanceof(this, rhs)
 			? ops["i32x4.add"](this.#ptr, rhs.#ptr)
-			: ops["i32x4.single.add"](this.#ptr, rhs);
+			: ops["i32x4.single.add"](this.#ptr, +rhs);
 
 		return new Uint32x4(memory, ptr);
 	}
@@ -686,7 +686,7 @@ const Uint32x4 = class extends Uint32Array {
 	"+="(rhs) {
 		Uint32x4.#instanceof(this, rhs)
 			? ops["i32x4.add="](this.#ptr, rhs.#ptr)
-			: ops["i32x4.single.add="](this.#ptr, rhs);
+			: ops["i32x4.single.add="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -773,7 +773,7 @@ const Uint32x4 = class extends Uint32Array {
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
@@ -809,7 +809,7 @@ const Int32x4 = class extends Int32Array {
 	"+"(rhs) {
 		const ptr = Int32x4.#instanceof(this, rhs)
 			? ops["i32x4.add"](this.#ptr, rhs.#ptr)
-			: ops["i32x4.single.add"](this.#ptr, rhs);
+			: ops["i32x4.single.add"](this.#ptr, +rhs);
 
 		return new Int32x4(memory, ptr);
 	}
@@ -817,7 +817,7 @@ const Int32x4 = class extends Int32Array {
 	"+="(rhs) {
 		Int32x4.#instanceof(this, rhs)
 			? ops["i32x4.add="](this.#ptr, rhs.#ptr)
-			: ops["i32x4.single.add="](this.#ptr, rhs);
+			: ops["i32x4.single.add="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -827,7 +827,7 @@ const Int32x4 = class extends Int32Array {
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
@@ -863,7 +863,7 @@ const Uint64x2 = class extends Uint64Array {
 	"+"(rhs) {
 		const ptr = Uint64x2.#instanceof(this, rhs)
 			? ops["i64x2.add"](this.#ptr, rhs.#ptr)
-			: ops["i64x2.single.add"](this.#ptr, rhs);
+			: ops["i64x2.single.add"](this.#ptr, +rhs);
 
 		return new Uint64x2(memory, ptr);
 	}
@@ -871,7 +871,7 @@ const Uint64x2 = class extends Uint64Array {
 	"+="(rhs) {
 		Uint64x2.#instanceof(this, rhs)
 			? ops["i64x2.add="](this.#ptr, rhs.#ptr)
-			: ops["i64x2.single.add="](this.#ptr, rhs);
+			: ops["i64x2.single.add="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -899,7 +899,7 @@ const Uint64x2 = class extends Uint64Array {
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
@@ -937,7 +937,7 @@ const Int64x2 = class extends Int64Array {
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
@@ -973,7 +973,7 @@ const Float32x4 = class extends Float32Array {
 	"+"(rhs) {
 		const ptr = Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.add"](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.add"](this.#ptr, rhs);
+			: ops["f32x4.single.add"](this.#ptr, +rhs);
 
 		return new Float32x4(memory, ptr);
 	}
@@ -981,7 +981,7 @@ const Float32x4 = class extends Float32Array {
 	"+="(rhs) {
 		Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.add="](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.add="](this.#ptr, rhs);
+			: ops["f32x4.single.add="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -989,7 +989,7 @@ const Float32x4 = class extends Float32Array {
 	"-"(rhs) {
 		const ptr = Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.sub"](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.sub"](this.#ptr, rhs);
+			: ops["f32x4.single.sub"](this.#ptr, +rhs);
 
 		return new Float32x4(memory, ptr);
 	}
@@ -997,7 +997,7 @@ const Float32x4 = class extends Float32Array {
 	"-="(rhs) {
 		Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.sub="](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.sub="](this.#ptr, rhs);
+			: ops["f32x4.single.sub="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1005,7 +1005,7 @@ const Float32x4 = class extends Float32Array {
 	"*"(rhs) {
 		const ptr = Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.mul"](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.mul"](this.#ptr, rhs);
+			: ops["f32x4.single.mul"](this.#ptr, +rhs);
 
 		return new Float32x4(memory, ptr);
 	}
@@ -1013,7 +1013,7 @@ const Float32x4 = class extends Float32Array {
 	"*="(rhs) {
 		Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.mul="](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.mul="](this.#ptr, rhs);
+			: ops["f32x4.single.mul="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1021,7 +1021,7 @@ const Float32x4 = class extends Float32Array {
 	"/"(rhs) {
 		const ptr = Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.div"](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.div"](this.#ptr, rhs);
+			: ops["f32x4.single.div"](this.#ptr, +rhs);
 
 		return new Float32x4(memory, ptr);
 	}
@@ -1029,7 +1029,7 @@ const Float32x4 = class extends Float32Array {
 	"/="(rhs) {
 		Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.div="](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.div="](this.#ptr, rhs);
+			: ops["f32x4.single.div="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1037,7 +1037,7 @@ const Float32x4 = class extends Float32Array {
 	"min"(rhs) {
 		const ptr = Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.min"](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.min"](this.#ptr, rhs);
+			: ops["f32x4.single.min"](this.#ptr, +rhs);
 
 		return new Float32x4(memory, ptr);
 	}
@@ -1045,7 +1045,7 @@ const Float32x4 = class extends Float32Array {
 	"min="(rhs) {
 		Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.min="](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.min="](this.#ptr, rhs);
+			: ops["f32x4.single.min="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1053,7 +1053,7 @@ const Float32x4 = class extends Float32Array {
 	"max"(rhs) {
 		const ptr = Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.max"](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.max"](this.#ptr, rhs);
+			: ops["f32x4.single.max"](this.#ptr, +rhs);
 
 		return new Float32x4(memory, ptr);
 	}
@@ -1061,7 +1061,7 @@ const Float32x4 = class extends Float32Array {
 	"max="(rhs) {
 		Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.max="](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.max="](this.#ptr, rhs);
+			: ops["f32x4.single.max="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1069,7 +1069,7 @@ const Float32x4 = class extends Float32Array {
 	"max"(rhs) {
 		const ptr = Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.max"](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.max"](this.#ptr, rhs);
+			: ops["f32x4.single.max"](this.#ptr, +rhs);
 
 		return new Float32x4(memory, ptr);
 	}
@@ -1077,7 +1077,7 @@ const Float32x4 = class extends Float32Array {
 	"max="(rhs) {
 		Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.max="](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.max="](this.#ptr, rhs);
+			: ops["f32x4.single.max="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1143,7 +1143,7 @@ const Float32x4 = class extends Float32Array {
 	"pmin"(rhs) {
 		const ptr = Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.pmin"](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.pmin"](this.#ptr, rhs);
+			: ops["f32x4.single.pmin"](this.#ptr, +rhs);
 
 		return new Float32x4(memory, ptr);
 	}
@@ -1151,7 +1151,7 @@ const Float32x4 = class extends Float32Array {
 	"pmin="(rhs) {
 		Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.pmin="](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.pmin="](this.#ptr, rhs);
+			: ops["f32x4.single.pmin="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1159,7 +1159,7 @@ const Float32x4 = class extends Float32Array {
 	"pmax"(rhs) {
 		const ptr = Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.pmax"](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.pmax"](this.#ptr, rhs);
+			: ops["f32x4.single.pmax"](this.#ptr, +rhs);
 
 		return new Float32x4(memory, ptr);
 	}
@@ -1167,7 +1167,7 @@ const Float32x4 = class extends Float32Array {
 	"pmax="(rhs) {
 		Float32x4.#instanceof(this, rhs)
 			? ops["f32x4.pmax="](this.#ptr, rhs.#ptr)
-			: ops["f32x4.single.pmax="](this.#ptr, rhs);
+			: ops["f32x4.single.pmax="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1257,7 +1257,7 @@ const Float32x4 = class extends Float32Array {
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
@@ -1292,7 +1292,7 @@ const Float64x2 = class extends Float64Array {
 	"+"(rhs) {
 		const ptr = Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.add"](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.add"](this.#ptr, rhs);
+			: ops["f64x2.single.add"](this.#ptr, +rhs);
 
 		return new Float64x2(memory, ptr);
 	}
@@ -1300,7 +1300,7 @@ const Float64x2 = class extends Float64Array {
 	"+="(rhs) {
 		Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.add="](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.add="](this.#ptr, rhs);
+			: ops["f64x2.single.add="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1308,7 +1308,7 @@ const Float64x2 = class extends Float64Array {
 	"-"(rhs) {
 		const ptr = Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.sub"](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.sub"](this.#ptr, rhs);
+			: ops["f64x2.single.sub"](this.#ptr, +rhs);
 
 		return new Float64x2(memory, ptr);
 	}
@@ -1316,7 +1316,7 @@ const Float64x2 = class extends Float64Array {
 	"-="(rhs) {
 		Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.sub="](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.sub="](this.#ptr, rhs);
+			: ops["f64x2.single.sub="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1324,7 +1324,7 @@ const Float64x2 = class extends Float64Array {
 	"*"(rhs) {
 		const ptr = Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.mul"](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.mul"](this.#ptr, rhs);
+			: ops["f64x2.single.mul"](this.#ptr, +rhs);
 
 		return new Float64x2(memory, ptr);
 	}
@@ -1332,7 +1332,7 @@ const Float64x2 = class extends Float64Array {
 	"*="(rhs) {
 		Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.mul="](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.mul="](this.#ptr, rhs);
+			: ops["f64x2.single.mul="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1340,7 +1340,7 @@ const Float64x2 = class extends Float64Array {
 	"/"(rhs) {
 		const ptr = Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.div"](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.div"](this.#ptr, rhs);
+			: ops["f64x2.single.div"](this.#ptr, +rhs);
 
 		return new Float64x2(memory, ptr);
 	}
@@ -1348,7 +1348,7 @@ const Float64x2 = class extends Float64Array {
 	"/="(rhs) {
 		Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.mul="](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.mul="](this.#ptr, rhs);
+			: ops["f64x2.single.mul="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1356,7 +1356,7 @@ const Float64x2 = class extends Float64Array {
 	"min"(rhs) {
 		const ptr = Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.min"](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.min"](this.#ptr, rhs);
+			: ops["f64x2.single.min"](this.#ptr, +rhs);
 
 		return new Float64x2(memory, ptr);
 	}
@@ -1364,7 +1364,7 @@ const Float64x2 = class extends Float64Array {
 	"min="(rhs) {
 		Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.min="](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.min="](this.#ptr, rhs);
+			: ops["f64x2.single.min="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1372,7 +1372,7 @@ const Float64x2 = class extends Float64Array {
 	"max"(rhs) {
 		const ptr = Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.min"](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.min"](this.#ptr, rhs);
+			: ops["f64x2.single.min"](this.#ptr, +rhs);
 
 		return new Float64x2(memory, ptr);
 	}
@@ -1380,7 +1380,7 @@ const Float64x2 = class extends Float64Array {
 	"max="(rhs) {
 		Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.min="](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.min="](this.#ptr, rhs);
+			: ops["f64x2.single.min="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1447,7 +1447,7 @@ const Float64x2 = class extends Float64Array {
 	"pmin"(rhs) {
 		const ptr = Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.pmin"](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.pmin"](this.#ptr, rhs);
+			: ops["f64x2.single.pmin"](this.#ptr, +rhs);
 
 		return new Float64x2(memory, ptr);
 	}
@@ -1455,7 +1455,7 @@ const Float64x2 = class extends Float64Array {
 	"pmin="(rhs) {
 		Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.pmin="](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.pmin="](this.#ptr, rhs);
+			: ops["f64x2.single.pmin="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1463,7 +1463,7 @@ const Float64x2 = class extends Float64Array {
 	"pmax"(rhs) {
 		const ptr = Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.pmax"](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.pmax"](this.#ptr, rhs);
+			: ops["f64x2.single.pmax"](this.#ptr, +rhs);
 
 		return new Float64x2(memory, ptr);
 	}
@@ -1471,7 +1471,7 @@ const Float64x2 = class extends Float64Array {
 	"pmax="(rhs) {
 		Float64x2.#instanceof(this, rhs)
 			? ops["f64x2.pmax="](this.#ptr, rhs.#ptr)
-			: ops["f64x2.single.pmax="](this.#ptr, rhs);
+			: ops["f64x2.single.pmax="](this.#ptr, +rhs);
 
 		return this;
 	}
@@ -1561,7 +1561,7 @@ const Float64x2 = class extends Float64Array {
 		byteOffset
 	) {
 		const ptr = buffer === memory
-			? byteOffset
+			? +byteOffset
 			: allocate();
 
 		garbageCollector.register(
