@@ -1,24 +1,46 @@
 /*
-api: memory_allocate
+Dependency chain:
+    memory
+     / \
+    /   \
+   /     \
+ storage  \
+    /   \  \
+   api   \  \
+           ops
 
-memory: clear_and_calculate_offset
+TODO: add a module to replace the control flow that is currently in JS;
+maybe expose a static `is(x: unknown): x is T` on each class,
+and pass into Wasm?
+*/
 
-storage: calculate_allocate & memory_free
+/*
+example v128.any_true interface:
 
-Linear dependency chain:
-`storage` depends on `memory`
-`api` depends on `storage`
-`ops` depend on `api`
-
- memory
-   |
-storage
-   |
-  api
-   |
-  ops
-
-TODO: add a module to replace the control flow that is currently in JS; maybe expose a static `is(x: unknown): x is T` on each class, and pass into Wasm?
+(import "0" "0" (global $false externref)) ;; JSValue::Boolean::false&
+(import "0" "1" (global $true externref)) ;; JSValue::Boolean::true&
+(table $boolean 2 2 externref) ;; JSValue::Boolean&[2]
+(start $_start)
+(func $_start
+	;; boolean :: [ null, null ]
+	i32.const 0
+	global.get $false
+	table.set $boolean
+	;; boolean :: [ false, null ]
+	i32.const 1
+	global.get $true
+	table.set $boolean
+	;; boolean :: [ false, true ]
+)
+(func (export "any_true") (param f64 f64) (result externref)
+	v128.const f64x2 0.0 0.0
+	local.get 0
+	f64x2.replace_lane 0
+	local.get 1
+	f64x2.replace_lane 1
+	i8x16.any_true
+	table.get $boolean
+)
 */
 
 import {
@@ -27,10 +49,11 @@ import {
 	i32, u32, s32,
 	i64, u64, s64,
 	f32, f64,
-	usize
+	usize,
+	TypedArray
 } from "./low-level-types.ts";
 
-import { TupleOf } from "./tuple-of.ts";
+import { tuple_of } from "./tuple-of.ts";
 
 // for instantiating Wasm
 const fetch_mapper = async (file_name: string): Promise<ArrayBuffer> => (
@@ -79,13 +102,22 @@ const storage_mod = await instantiate(
 		// throw: () => { throw new RangeError("Array buffer allocation failed"); };
 	}
 ) as {
-	storage: WebAssembly.Memory, // Memory(1, 1)
-	// why is `storage` exported?
 	calculate_allocation: () => usize,
 	memory_free: (ptr: usize) => void
 };
 
-type Class = new (...args: any) => any;
+type _class_t = new (
+	buffer?: ArrayBuffer,
+	byteOffset?: usize
+) => any;
+// technicially incorrect, since the references are constant, and the JS `this` parameter is ignored
+type static_method<
+	num_t extends number | bigint,
+	length extends number = 1
+> = <class_t extends _class_t>(
+	this: class_t,
+	..._: tuple_of<num_t, length>
+) => InstanceType<class_t>;
 
 const api_mod = await instantiate(
 	api_file, {
@@ -95,7 +127,7 @@ const api_mod = await instantiate(
 		},
 		Reflect,
 		js: {
-			// [ ArrayBuffer, i32 ]
+			// arguments: [ ArrayBuffer, i32 ]
 			arguments: [ memory_mod.memory.buffer, 0 | 0 ] as unknown as WebAssembly.ImportValue
 			// (0 | 0) VM hint toward i32 representaton?
 			// unknown cast because typings don't include externref or funcref yet
@@ -103,60 +135,29 @@ const api_mod = await instantiate(
 	}
 ) as {
 	unreachable: () => never,
-	load_all_classes: (..._: TupleOf<Function, 10>) => void,
-	// TODO: de-duplicate, use a generic type alias
-	"u8x16.of": <T extends Class>(this: T, ..._: TupleOf<u8, 16>) => InstanceType<typeof this>,
-	"s8x16.of": <T extends Class>(this: T, ..._: TupleOf<s8, 16>) => InstanceType<typeof this>,
-	"u16x8.of": <T extends Class>(this: T, ..._: TupleOf<u16, 8>) => InstanceType<typeof this>,
-	"s16x8.of": <T extends Class>(this: T, ..._: TupleOf<s16, 8>) => InstanceType<typeof this>,
-	"u32x4.of": <T extends Class>(this: T, ..._: TupleOf<u32, 4>) => InstanceType<typeof this>,
-	"s32x4.of": <T extends Class>(this: T, ..._: TupleOf<s32, 4>) => InstanceType<typeof this>,
-	"u64x2.of": <T extends Class>(this: T, ..._: TupleOf<u64, 2>) => InstanceType<typeof this>,
-	"s64x2.of": <T extends Class>(this: T, ..._: TupleOf<s64, 2>) => InstanceType<typeof this>,
-	"f32x4.of": <T extends Class>(this: T, ..._: TupleOf<f32, 4>) => InstanceType<typeof this>,
-	"f64x4.of": <T extends Class>(this: T, ..._: TupleOf<f64, 2>) => InstanceType<typeof this>,
-
-	"u8x16.splat": <T extends Class>(this: T, _: u8) => InstanceType<typeof this>
-	"s8x16.splat": <T extends Class>(this: T, _: s8) => InstanceType<typeof this>
-	"u16x8.splat": <T extends Class>(this: T, _: u16) => InstanceType<typeof this>
-	"s16x8.splat": <T extends Class>(this: T, _: s16) => InstanceType<typeof this>
-	"u32x4.splat": <T extends Class>(this: T, _: u32) => InstanceType<typeof this>
-	"s32x4.splat": <T extends Class>(this: T, _: s32) => InstanceType<typeof this>
-	"u64x2.splat": <T extends Class>(this: T, _: u64) => InstanceType<typeof this>
-	"s64x2.splat": <T extends Class>(this: T, _: s64) => InstanceType<typeof this>
-	"f32x4.splat": <T extends Class>(this: T, _: f32) => InstanceType<typeof this>
-	"f64x2.splat": <T extends Class>(this: T, _: f64) => InstanceType<typeof this>
+	// load_all_classes: (..._: [ Uint8x16, Int8x16, Uint16x8, Int16x8, uint32x4, Uint32x4, Uint64x2, Int64x2, Float32x4, Float64x2 ]) => void
+	load_all_classes: (..._: tuple_of<Function, 10>) => void,
+	"u8x16.of": static_method<u8, 16>,
+	"s8x16.of": static_method<s8, 16>,
+	"u16x8.of": static_method<u16, 8>,
+	"s16x8.of": static_method<s16, 8>,
+	"u32x4.of": static_method<u32, 4>,
+	"s32x4.of": static_method<s32, 4>,
+	"u64x2.of": static_method<u64, 2>,
+	"s64x2.of": static_method<s64, 2>,
+	"f32x4.of": static_method<f32, 4>,
+	"f64x4.of": static_method<f64, 2>,
+	"u8x16.splat": static_method<u8>,
+	"s8x16.splat": static_method<s8>,
+	"u16x8.splat": static_method<u16>,
+	"s16x8.splat": static_method<s16>,
+	"u32x4.splat": static_method<u32>,
+	"s32x4.splat": static_method<s32>,
+	"u64x2.splat": static_method<u64>,
+	"s64x2.splat": static_method<s64>,
+	"f32x4.splat": static_method<f32>,
+	"f64x2.splat": static_method<f64>
 };
-
-/*type $i8x16<T extends i8, Class> = (..._: TupleOf<T, 16>) => Class
-"u8x16.of": $i8x16<u8, Uint8x16>
-"s8x16.of": $i8x16<s8, Int8x16>
-
-type $i16x8<T extends i16, Class> = (..._: TupleOf<T, 8>) => Class
-"u16x8.of": $i16x8<u16, Uint16x8>
-"s16x8.of": $i16x8<s16, Int16x8>
-
-type $i32x4<T extends i32, Class> = (..._: TupleOf<T, 4>) => Class
-"u32x4.of": $i32x4<u32, Uint32x4>
-"s32x4.of": $i32x4<s32, Int32x4>
-
-type $i64x2<T extends i64, Class> = (..._: TupleOf<T, 2>) => Class
-"u64x2.of": $i64x2<u64, Uint64x2>
-"s64x2.of" $i64x2<s64, Int64x2>
-
-"f32x4.of": (..._: TupleOf<f32, 4>) => Float32x4
-"f32x4.of": (..._: TupleOf<f64, 2>) => Float64x2
-
-"u8x16.splat": (_: u8) => Uint8x16
-"s8x16.splat": (_: s8) => Int8x16
-"u16x8.splat": (_: u16) => Uint16x8
-"s16x8.splat": (_: s16) => Int16x8
-"u32x4.splat": (_: u32) => Uint32x4
-"s32x4.splat": (_: s32) => Int32x4
-"u64x2.splat": (_: u64) => Uint64x2
-"s64x2.splat": (_: s64) => Int64x2
-"f32x4.splat": (_: f32) => Float32x4
-"f64x2.splat": (_: f64) => Float64x2*/
 
 type wasm_t = i32 | f32 | i64 | f64 | usize;
 
@@ -260,7 +261,10 @@ lhs + rhs;
 => &(39179, 2739, 13820, 414)
 */
 
-// TODO: implement missing operations, such as single parameter, splatting bit-wise operations. Ex: { new TxN(...)["&="](5) }
+// TODO: implement missing operations,
+// such as single parameter,
+// splatting bit-wise operations.
+// Ex: { new TxN(...)["&="](5) }
 const ops_mod = await instantiate(
 	ops_file, {
 		wasm: {
@@ -685,7 +689,7 @@ export {
 	ops_mod as ops
 };
 
-export interface SIMD<T, num_t extends number | bigint, N extends usize> {
+export interface SIMD<T, num_t extends number | bigint, N extends usize> extends ArrayBufferView {
 	readonly buffer: never;
 	readonly byteOffset: never;
 
