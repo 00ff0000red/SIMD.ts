@@ -13,7 +13,7 @@ import {
 import { Uint64Array, Int64Array } from "./low-level-types.ts";
 
 // forward declarations
-const { TypeError, Set } = self;
+const { TypeError, Set, Object } = self;
 
 const Uint8x16 = class extends Uint8Array {
 	#ptr;
