@@ -2,11 +2,15 @@
 
 (import "wasm" "clear_and_calculate_offset" (func $clear_and_calculate_offset (param i32) (result i32))) ;; (usize): (usize)
 (memory (export "storage") 1 1) ;; bool[0x10000]
-(func (export "calculate_allocation") (result i32) ;; (usize): ()
-	(local i32)
+
+;; equivalent to { Uint8Array(storage).indexOf(0) << 4 }, simply finds the first empty index; can this algorithm be improved?
+(func $calculate_allocation (export "calculate_allocation") (result i32) ;; (): (usize)
+	(local i32) ;; loop counter
 	i32.const 0
 	local.set 0
 
+	;; TODO: vectorize this! The entire point of this is to use vectors
+	;; alternatively use u64.clz/u64.ctz, and bitwise operations to determine offsets
 	block $block ;; reverse iteration later
 		loop $loop
 			local.get 0
@@ -30,9 +34,17 @@
 	i32.store8 align=1
 
 	local.get 0 ;; return iterator
-	i32.const 4 ;; equivalent to * 16; to offset loading a v128
-	i32.shl
+	i32.const 4
+	i32.shl ;; equivalent to (i * 16u); to offset loading a v128
+	;; dup? Most, if not all operations dup the call afterward; except the JS calls
 )
+
+(; when using dup in alloc function
+(func (export "js_alloc") (result i32) ;; (): (usize)
+	call $calculate_allocation
+	drop
+)
+;)
 
 (func (export "memory_free") (param i32) ;; (): (usize)
 	local.get 0
