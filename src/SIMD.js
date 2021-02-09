@@ -1,13 +1,4 @@
 "hide source";
-// TODO: port this into TS
-// this was originally written in TypeScript, but it became too much of a hassle w/o private, static, class methods
-
-// TODO: this is a whole lot of JS wrapper glue to get to Wasm functionality, and it may very well be killing any potential performance gains
-// * benchmark, and compare the new API
-// * Move more into Wasm
-
-// TODO: not all operations are implemented in the JS side
-// also, consider adding v128.any_true, and other miscellaneous operations
 
 import {
 	api,
@@ -21,7 +12,8 @@ import {
 
 import { Uint64Array, Int64Array } from "./low-level-types.ts";
 
-const { RuntimeError } = WebAssembly;
+// forward declarations
+const { TypeError, Set } = self;
 
 const Uint8x16 = class extends Uint8Array {
 	#ptr;
@@ -33,12 +25,14 @@ const Uint8x16 = class extends Uint8Array {
 	static #instanceof(lhs, rhs) {
 		"sensitive";
 
+		// if (!(#ptr in lhs)) { throw ... }
 		try {
 			lhs.#ptr;
 		} catch {
-			throw new RuntimeError("this is not a Uint8x16.");
+			throw new TypeError("this is not a Uint8x16.");
 		}
 
+		// return #ptr in rhs;
 		try {
 			rhs.#ptr;
 			return true;
@@ -165,8 +159,6 @@ const Uint8x16 = class extends Uint8Array {
 		return this;
 	}
 
-	// >> and << are broken!
-	// maybe it's V8's implementation?
 	">>"(rhs) {
 		// assert self; ignore result in shift ops
 		Uint8x16.#instanceof(this, this);
@@ -346,6 +338,62 @@ these are scary
 	}
 };
 
+const Int8x16 = class extends Int8Array {
+	#ptr;
+
+	static splat = api["s8x16.splat"];
+	static of = api["s8x16.of"];
+
+	static #instanceof(lhs, rhs) {
+		"sensitive";
+
+		try {
+			lhs.#ptr;
+		} catch {
+			throw new TypeError("this is not a Int8x16.");
+		}
+
+		try {
+			rhs.#ptr;
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	"+"(rhs) {
+		const ptr = Int8x16.#instanceof(this, rhs)
+			? ops["i8x16.add"](this.#ptr, rhs.#ptr)
+			: ops["i8x16.single.add"](this.#ptr, rhs);
+
+		return new Int8x16(memory, ptr);
+	}
+
+	"+="(rhs) {
+		Int8x16.#instanceof(this, rhs)
+			? ops["i8x16.add="](this.#ptr, rhs.#ptr)
+			: ops["i8x16.single.add="](this.#ptr, rhs);
+
+		return this;
+	}
+
+	constructor(
+		buffer,
+		byteOffset
+	) {
+		const ptr = buffer === memory
+			? byteOffset
+			: allocate();
+
+		super(memory, ptr, 16);
+
+		garbageCollector.register(
+			this,
+			this.#ptr = ptr
+		);
+	}
+};
+
 const Uint16x8 = class extends Uint16Array {
 	#ptr;
 
@@ -358,7 +406,7 @@ const Uint16x8 = class extends Uint16Array {
 		try {
 			lhs.#ptr;
 		} catch {
-			throw new RuntimeError("this is not a Uint16x8.");
+			throw new TypeError("this is not a Uint16x8.");
 		}
 
 		try {
@@ -572,6 +620,46 @@ const Uint16x8 = class extends Uint16Array {
 	}
 };
 
+const Int16x8 = class extends Int16Array {
+	#ptr;
+
+	static splat = api["s16x8.splat"];
+	static of = api["s16x8.of"];
+
+	static #instanceof(lhs, rhs) {
+		"sensitive";
+
+		try {
+			lhs.#ptr;
+		} catch {
+			throw new TypeError("this is not a Int16x8.");
+		}
+
+		try {
+			rhs.#ptr;
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	constructor(
+		buffer,
+		byteOffset
+	) {
+		const ptr = buffer === memory
+			? byteOffset
+			: allocate();
+
+		super(memory, ptr, 8);
+
+		garbageCollector.register(
+			this,
+			this.#ptr = ptr
+		);
+	}
+};
+
 const Uint32x4 = class extends Uint32Array {
 	#ptr;
 
@@ -584,7 +672,7 @@ const Uint32x4 = class extends Uint32Array {
 		try {
 			lhs.#ptr;
 		} catch {
-			throw new RuntimeError("this is not a Uint32x4.");
+			throw new TypeError("this is not a Uint32x4.");
 		}
 
 		try {
@@ -705,6 +793,62 @@ const Uint32x4 = class extends Uint32Array {
 	}
 };
 
+const Int32x4 = class extends Int32Array {
+	#ptr;
+
+	static splat = api["s32x4.splat"];
+	static of = api["s32x4.of"];
+
+	static #instanceof(lhs, rhs) {
+		"sensitive";
+
+		try {
+			lhs.#ptr;
+		} catch {
+			throw new TypeError("this is not a Int32x4.");
+		}
+
+		try {
+			rhs.#ptr;
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	"+"(rhs) {
+		const ptr = Int32x4.#instanceof(this, rhs)
+			? ops["i32x4.add"](this.#ptr, rhs.#ptr)
+			: ops["i32x4.single.add"](this.#ptr, rhs);
+
+		return new Int32x4(memory, ptr);
+	}
+
+	"+="(rhs) {
+		Int32x4.#instanceof(this, rhs)
+			? ops["i32x4.add="](this.#ptr, rhs.#ptr)
+			: ops["i32x4.single.add="](this.#ptr, rhs);
+
+		return this;
+	}
+
+	constructor(
+		buffer,
+		byteOffset
+	) {
+		const ptr = buffer === memory
+			? byteOffset
+			: allocate();
+
+		super(memory, ptr, 4);
+
+		garbageCollector.register(
+			this,
+			this.#ptr = ptr
+		);
+	}
+};
+
 const Uint64x2 = class extends Uint64Array {
 	#ptr;
 
@@ -717,7 +861,7 @@ const Uint64x2 = class extends Uint64Array {
 		try {
 			lhs.#ptr;
 		} catch {
-			throw new RuntimeError("this is not a Uint64x2.");
+			throw new TypeError("this is not a Uint64x2.");
 		}
 
 		try {
@@ -779,158 +923,6 @@ const Uint64x2 = class extends Uint64Array {
 	}
 };
 
-const Int8x16 = class extends Int8Array {
-	#ptr;
-
-	static splat = api["s8x16.splat"];
-	static of = api["s8x16.of"];
-
-	static #instanceof(lhs, rhs) {
-		"sensitive";
-
-		try {
-			lhs.#ptr;
-		} catch {
-			throw new RuntimeError("this is not a Int8x16.");
-		}
-
-		try {
-			rhs.#ptr;
-			return true;
-		} catch {
-			return false;
-		}
-	}
-
-	"+"(rhs) {
-		const ptr = Int8x16.#instanceof(this, rhs)
-			? ops["i8x16.add"](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.add"](this.#ptr, rhs);
-
-		return new Int8x16(memory, ptr);
-	}
-
-	"+="(rhs) {
-		Int8x16.#instanceof(this, rhs)
-			? ops["i8x16.add="](this.#ptr, rhs.#ptr)
-			: ops["i8x16.single.add="](this.#ptr, rhs);
-
-		return this;
-	}
-
-	constructor(
-		buffer,
-		byteOffset
-	) {
-		const ptr = buffer === memory
-			? byteOffset
-			: allocate();
-
-		super(memory, ptr, 16);
-
-		garbageCollector.register(
-			this,
-			this.#ptr = ptr
-		);
-	}
-};
-
-const Int16x8 = class extends Int16Array {
-	#ptr;
-
-	static splat = api["s16x8.splat"];
-	static of = api["s16x8.of"];
-
-	static #instanceof(lhs, rhs) {
-		"sensitive";
-
-		try {
-			lhs.#ptr;
-		} catch {
-			throw new RuntimeError("this is not a Int16x8.");
-		}
-
-		try {
-			rhs.#ptr;
-			return true;
-		} catch {
-			return false;
-		}
-	}
-
-	constructor(
-		buffer,
-		byteOffset
-	) {
-		const ptr = buffer === memory
-			? byteOffset
-			: allocate();
-
-		super(memory, ptr, 8);
-
-		garbageCollector.register(
-			this,
-			this.#ptr = ptr
-		);
-	}
-};
-
-const Int32x4 = class extends Int32Array {
-	#ptr;
-
-	static splat = api["s32x4.splat"];
-	static of = api["s32x4.of"];
-
-	static #instanceof(lhs, rhs) {
-		"sensitive";
-
-		try {
-			lhs.#ptr;
-		} catch {
-			throw new RuntimeError("this is not a Int32x4.");
-		}
-
-		try {
-			rhs.#ptr;
-			return true;
-		} catch {
-			return false;
-		}
-	}
-
-	"+"(rhs) {
-		const ptr = Int32x4.#instanceof(this, rhs)
-			? ops["i32x4.add"](this.#ptr, rhs.#ptr)
-			: ops["i32x4.single.add"](this.#ptr, rhs);
-
-		return new Int32x4(memory, ptr);
-	}
-
-	"+="(rhs) {
-		Int32x4.#instanceof(this, rhs)
-			? ops["i32x4.add="](this.#ptr, rhs.#ptr)
-			: ops["i32x4.single.add="](this.#ptr, rhs);
-
-		return this;
-	}
-
-	constructor(
-		buffer,
-		byteOffset
-	) {
-		const ptr = buffer === memory
-			? byteOffset
-			: allocate();
-
-		super(memory, ptr, 4);
-
-		garbageCollector.register(
-			this,
-			this.#ptr = ptr
-		);
-	}
-};
-
 const Int64x2 = class extends Int64Array {
 	#ptr;
 
@@ -943,7 +935,7 @@ const Int64x2 = class extends Int64Array {
 		try {
 			lhs.#ptr;
 		} catch {
-			throw new RuntimeError("this is not a Int64x2.");
+			throw new TypeError("this is not a Int64x2.");
 		}
 
 		try {
@@ -983,7 +975,7 @@ const Float32x4 = class extends Float32Array {
 		try {
 			lhs.#ptr;
 		} catch {
-			throw new RuntimeError("this is not a Float32x4.");
+			throw new TypeError("this is not a Float32x4.");
 		}
 
 		try {
@@ -1305,7 +1297,7 @@ const Float64x2 = class extends Float64Array {
 		try {
 			lhs.#ptr;
 		} catch {
-			throw new RuntimeError("this is not a Float64x2.");
+			throw new TypeError("this is not a Float64x2.");
 		}
 
 		try {
@@ -1603,72 +1595,64 @@ const Float64x2 = class extends Float64Array {
 {
 	const vector_classes = new Set([
 		Uint8x16,
-		Uint16x8,
-		Uint32x4,
-		Uint64x2,
 		Int8x16,
+		Uint16x8,
 		Int16x8,
+		Uint32x4,
 		Int32x4,
+		Uint64x2,
 		Int64x2,
 		Float32x4,
 		Float64x2
 	]);
 
-	const properties = (() => {
-		const accessor = {
-			get: unreachable,
-			configurable: true // to mimic putting it in the class itself
-		};
-
-		return {
-			buffer: accessor,
-			byteOffset: accessor
-		};
-	})();
-
 	{
-		const {
-			freeze,
-			defineProperties
-		} = Object;
-
 		// sets v128#buffer and v128#byteLength to be accessed through Wasm instead.
-		for (const vector_class of vector_classes) {
-			const { prototype } = vector_class;
+		const properties = (() => {
+			const accessor = {
+				get: unreachable,
+				configurable: true // to mimic putting it in the class itself
+			};
 
-			defineProperties(
-				prototype,
-				properties
-			);
+			return {
+				buffer: accessor,
+				byteOffset: accessor
+			};
+		})();
 
-			freeze(prototype);
-			freeze(vector_class);
+		{
+			const {
+				freeze,
+				defineProperties
+			} = Object;
+
+			for ( const vector_class of vector_classes ) {
+				const { prototype } = freeze(vector_class);
+
+				defineProperties(
+					prototype,
+					properties
+				);
+
+				freeze(prototype);
+			}
 		}
 	}
 
 	// loads JS references into WebAssembly
-	api.load_all_classes(
-		Uint8x16,
-		Int8x16,
-		Uint16x8,
-		Int16x8,
-		Uint32x4,
-		Int32x4,
-		Uint64x2,
-		Int64x2,
-		Float32x4,
-		Float64x2
+	api.register_js_classes(
+		...vector_classes
 	);
 }
 
 export {
 	Uint8x16,
-	Uint16x8,
-	Uint32x4,
-	Uint64x2,
 	Int8x16,
+	Uint16x8,
 	Int16x8,
+	Uint32x4,
 	Int32x4,
+	Uint64x2,
 	Int64x2,
 	Float32x4,
 	Float64x2
