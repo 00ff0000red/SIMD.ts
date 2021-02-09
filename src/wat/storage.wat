@@ -1,7 +1,7 @@
 ;; storage
 
 (import "wasm" "clear_and_calculate_offset" (func $clear_and_calculate_offset (param i32) (result i32))) ;; (usize): (usize)
-(memory (export "storage") 1 1) ;; bool[0x10000]
+(memory 1 1) ;; bool[0x10000]
 
 ;; equivalent to { Uint8Array(storage).indexOf(0) << 4 }, simply finds the first empty index; can this algorithm be improved?
 (func $calculate_allocation (export "calculate_allocation") (result i32) ;; (): (usize)
